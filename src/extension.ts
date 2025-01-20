@@ -374,19 +374,39 @@ const compileAndRunCppFile = (cppFilePath: string, testFilePath: string, expecte
 };
 
 // Function to compare outputs
+const normalizeOutput = (str: string) => str.replace(/\r\n/g, '\n').replace(/\s+/g, ' ').trim();
+
 const compareOutputs = (expectedOutputFilePath: string, outputFilePath: string) => {
     try {
-        const expectedOutput = fs.readFileSync(expectedOutputFilePath, 'utf-8').trim();
-        const actualOutput = fs.readFileSync(outputFilePath, 'utf-8').trim();
+        const expectedOutput = normalizeOutput(fs.readFileSync(expectedOutputFilePath, 'utf-8'));
+        const actualOutput = normalizeOutput(fs.readFileSync(outputFilePath, 'utf-8'));
 
         if (expectedOutput === actualOutput) {
             vscode.window.showInformationMessage('Outputs match!');
         } else {
-            vscode.window.showErrorMessage('Outputs do not match!');
+            vscode.window.showErrorMessage('Outputs do not match! Check console for differences.');
+
+            const expectedLines = expectedOutput.split('\n');
+            const actualLines = actualOutput.split('\n');
+
+            console.error('--- Expected vs Actual Output ---');
+
+            expectedLines.forEach((line, index) => {
+                const actualLine = actualLines[index] || '';
+                if (line !== actualLine) {
+                    console.error(`Mismatch at line ${index + 1}:`);
+                    console.error(`Expected: "${line}"`);
+                    console.error(`Actual  : "${actualLine}"`);
+                }
+            });
+
+            // Show first mismatch in VS Code UI
+            const firstMismatchIndex = expectedLines.findIndex((line, index) => line !== actualLines[index]);
+            if (firstMismatchIndex !== -1) {
+                vscode.window.showErrorMessage(`Mismatch at line ${firstMismatchIndex + 1}`);
+            }
         }
     } catch (error) {
-        vscode.window.showErrorMessage(
-            `Error reading output files: ${error instanceof Error ? error.message : 'Unknown error'}`
-        );
+        vscode.window.showErrorMessage('Error reading output files: ' + (error as Error).message);
     }
 };

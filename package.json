@@ -2,13 +2,13 @@
 	"name": "KumudCodeRunner",
 	"displayName": "C++/python Runner",
 	"description": "Sample showing how to use the test APIs",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"publisher": "Kumudsagar",
 	"private": true,
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Microsoft/vscode-extension-samples.git"
+		"url": "git+https://github.com/Kumud2908/Leetcode-Verifier"
 	},
 	"engines": {
 		"vscode": "^1.88.0"
